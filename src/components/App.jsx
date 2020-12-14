@@ -1,8 +1,9 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import Heading from "./Heading";
 import Note from "./Note";
 import Footer from "./Footer";
 import CreateArea from "./CreateArea";
+import axios from "axios";
 
 
 function App() {
@@ -15,7 +16,18 @@ function App() {
         });
     }
 
+    useEffect(() => {
+        axios.get("http://localhost:3000/notes/")
+        .then (res => {
+            setNotes(res.data);
+        })
+        .catch(err => {
+            console.log(err);
+        })
+    });
+
     function deleteNote(id){
+        axios.delete("http://localhost:3000/notes/${id}")
         setNotes(prevNotes => {
             return prevNotes.filter((noteItem, index) => {
                 return index !== id;
@@ -30,18 +42,19 @@ function App() {
             onAdd={addNote}
         />
         {notes.map((noteItem, index) => {
-            return <Note 
+            return (
+                <Note 
                 key = {index}
-                id = {index}
+                _id = {noteItem._id}
                 title = {noteItem.title}
                 content = {noteItem.content}
                 onDelete = {deleteNote}
             />
+            );
         })}
         <Footer />
       </div>
     );
   }
-
 
 export default App;
